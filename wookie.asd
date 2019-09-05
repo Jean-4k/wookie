@@ -17,20 +17,20 @@
                #:fast-io
                #:vom
 	       #:cl-annot)
-  :components
-  ((:file "config")
-   (:file "util" :depends-on ("config"))
-   (:file "package" :depends-on ("util"))
-   (:file "state" :depends-on ("package"))
-   (:file "error" :depends-on ("package" "state"))
-   (:file "route" :depends-on ("error"))
-   (:file "plugin" :depends-on ("package" "state"))
-   (:file "hook" :depends-on ("package" "state"))
-   (:file "request-response" :depends-on ("error" "hook"))
-   (:file "parser" :depends-on ("error" "request-response" "route" "hook" "plugin"))
-   (:file "listener" :depends-on ("error" "request-response" "route" "hook" "plugin" "parser"))
-   #-(or :wookie-no-ssl) (:file "listener-ssl" :depends-on ("listener"))
-   (:file "helper" :depends-on ("listener" "plugin" "package")))
+  :serial t
+  :components ((:file "config")
+	       (:file "util")
+	       (:file "package")
+	       (:file "state")
+	       (:file "error")
+	       (:file "route")
+	       (:file "plugin")
+	       (:file "hook")
+	       (:file "request-response")
+	       (:file "parser")
+	       (:file "listener")
+	       #-(or :wookie-no-ssl) (:file "listener-ssl")
+	       (:file "helper"))
   :in-order-to ((test-op (test-op :wookie/tests))))
 
 

@@ -3,7 +3,7 @@
 
 
 
-@export-class
+@export
 (define-condition wookie-error (error)
   ((msg :initarg :msg :reader wookie-error-msg :initform nil)
    (socket :initarg :socket :reader wookie-error-socket :initform nil))
