@@ -10,7 +10,6 @@
            
            #:response-error-response
 
-           #:register-plugin
            #:plugin-config
            #:plugin-request-data
            #:load-plugins

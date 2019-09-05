@@ -27,6 +27,7 @@
 
 
 
+@export
 (defun register-plugin (plugin-name init-function unload-function)
   "Register a plugin in the Wookie plugin system. Generally this is called from
    a plugin.lisp file, but can also be called elsewhere in the plugin. The
