@@ -183,6 +183,7 @@
 
 
 
+@export
 (defmacro defroute ((method resource &key (regex t) (case-sensitive t)
                                           chunk (buffer-body t) suppress-100
                                           (replace t)

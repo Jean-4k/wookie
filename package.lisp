@@ -10,7 +10,6 @@
            #:get-header
            #:set-header
            
-           #:defroute
            #:with-vhost
 
            #:clear-hooks
