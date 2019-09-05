@@ -8,7 +8,6 @@
   (:export #:get-header
            #:set-header
            
-           #:response-error
            #:response-error-response
            #:response-already-sent
            #:request

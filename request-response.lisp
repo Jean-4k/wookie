@@ -1,7 +1,9 @@
+(annot:enable-annot-syntax)
 (in-package :wookie)
 
 
 
+@export
 (define-condition response-error (wookie-error)
   ((response :initarg :response :reader response-error-response :initform nil))
   (:report (lambda (c s) (format s "Response error: ~a" (response-error-response c))))
