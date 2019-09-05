@@ -277,6 +277,7 @@
 
 
 
+@export
 (defun finish-response (response &key (close nil close-specified-p))
   "Given the stream passed back from start-response, finalize the response (send
    empty chunk) and close the connection, if specified."
