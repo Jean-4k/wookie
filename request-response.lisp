@@ -23,6 +23,7 @@
 
 
 
+@export-class
 (defclass request ()
   ((socket :accessor request-socket :initarg :socket :initform nil)
    (method :accessor request-method :initarg :method :initform :get)

@@ -9,7 +9,6 @@
            #:set-header
            
            #:response-error-response
-           #:request
            #:request-socket
            #:request-method
            #:request-resource
