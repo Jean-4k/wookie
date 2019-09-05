@@ -5,8 +5,7 @@
 (defpackage :wookie-util
   (:use :cl :wookie-config :blackbird)
   (:shadow blackbird:*debug-on-error*)
-  (:export #:getf-reverse
-           #:lookup-status-text))
+  (:export #:lookup-status-text))
 
 
 
@@ -211,6 +210,7 @@
 
 
 
+@export
 (defun getf-reverse (plist key)
   "Like getf, except the VALUE comes before the KEY:
      '(:value1 :key1 :value2 :key2)
