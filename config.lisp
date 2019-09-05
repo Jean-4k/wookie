@@ -5,6 +5,7 @@
            #:*hide-version*
            #:*enabled-plugins*
            #:*tmp-file-store*))
+(annot:enable-annot-syntax)
 (in-package :wookie-config)
 
 (defvar *debug-on-error* nil
@@ -18,6 +19,7 @@
   "Boolean specifying whether or not to hide the Wookie version in the Server
    header.")
 
+@export
 (defvar *enabled-plugins* '(:get :post :multipart :http-var :cookie :directory-router)
   "A list of (keyword) names of enabled plugins.")
 

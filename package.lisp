@@ -10,7 +10,6 @@
            
            #:response-error-response
 
-           #:*enabled-plugins*
            #:*plugin-folders*
            #:register-plugin
            #:plugin-config
