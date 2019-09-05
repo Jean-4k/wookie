@@ -5,8 +5,7 @@
 (defpackage :wookie-util
   (:use :cl :wookie-config :blackbird)
   (:shadow blackbird:*debug-on-error*)
-  (:export #:set-header
-           #:map-plist
+  (:export #:map-plist
            #:camel-case
            #:querystringp
            #:set-querystring-hash
@@ -48,6 +47,7 @@
 
 
 
+@export
 (defmacro set-header (header-collection key value)
   "Set a value into a header collection."
   (alexandria:with-gensyms (s-key)
