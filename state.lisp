@@ -41,5 +41,8 @@
      make threading Wookie easier by allowing the declaration of one
      thread-local variable instad of many."))
 
+
+
+@export
 (defvar *state* (make-instance 'wookie-state)
   "Holds all global state/context for Wookie.")
