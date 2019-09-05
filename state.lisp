@@ -30,7 +30,8 @@
     :documentation "Holds all plugin configuration.")
    (routes
     :initarg :routes
-    :initform (make-array 0 :adjustable t
+    :initform (make-array 0
+			  :adjustable t
 			  :fill-pointer t)
     :accessor wookie-state-routes
     :documentation "Holds the routes this context uses.")
