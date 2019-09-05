@@ -10,8 +10,6 @@
            
            #:response-error-response
 
-           #:defplugfun
-
            #:listener
            #:listener-bind
            #:listener-port

@@ -248,6 +248,7 @@
 
 
 
+@export
 (defmacro defplugfun (name args &body body)
   "Define a plugin function that is auto-exported to the :wookie-plugin-export
    package."
