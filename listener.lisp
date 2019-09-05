@@ -1,5 +1,7 @@
 (in-package :wookie)
 
+
+
 (defclass listener ()
   ((bind :accessor listener-bind :initarg :bind :initform nil)
    (port :accessor listener-port :initarg :port :initform 80)
@@ -7,9 +9,13 @@
    (event-cb :accessor listener-event-cb :initarg :event-cb :initform nil))
   (:documentation "Describes an HTTP listener."))
 
+
+
 (defgeneric start-server (listener)
   (:documentation
     "Start Wookie with the given listener."))
+
+
 
 (defmethod start-server ((listener listener))
   ;; start the async server
