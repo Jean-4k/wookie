@@ -1,10 +1,16 @@
-(in-package :wookie)
-
 ;;; This file defines and instantiates Wookie's global state handler. This is
 ;;; used throughout Wookie to store hook functions, routes, plugin state, etc.
 ;;; The having all state in one variable makes it a lot easier to thread Wookie
 ;;; without worrying about threads bumping into each other.
 
+
+
+(annot:enable-annot-syntax)
+(in-package :wookie)
+
+
+
+@export-class
 (defclass wookie-state ()
   ((hooks
      :accessor wookie-state-hooks

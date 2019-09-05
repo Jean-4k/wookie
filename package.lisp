@@ -1,12 +1,7 @@
 (defpackage :wookie
-  (:use :cl :wookie-config :wookie-util :blackbird)
+  (:use :cl :wookie-config :wookie-util :blackbird :annot.class)
   (:shadow blackbird:*debug-on-error*)
-  (:export #:wookie-state
-           #:wookie-state-hooks
-           #:wookie-state-plugins
-           #:wookie-state-plugin-config
-           #:wookie-state-routes
-           #:*state*
+  (:export #:*state*
            
            #:wookie-error
            #:wookie-error-msg
@@ -76,4 +71,3 @@
            #-(or :wookie-no-ssl) #:listener-certificate
            #-(or :wookie-no-ssl) #:listener-key
            #-(or :wookie-no-ssl) #:listener-password))
-
