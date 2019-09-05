@@ -53,6 +53,13 @@
 
 
 
+(defun make-wookie-state-hooks ()
+  "Initialize a wookie-state slot."
+  (make-hash-table :test #'eq
+		   :size 10))
+
+
+
 @export
 (defvar *state* (make-wookie-state)
   "Holds all global state/context for Wookie.")

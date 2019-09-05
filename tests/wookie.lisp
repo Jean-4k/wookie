@@ -31,4 +31,13 @@
 	  (gethash :test1 hooks))
       (is (gethash :test2 gotten-hooks)
 	  (gethash :test2 hooks)))))
+
+
+
+(subtest "make-wookie-state-hooks"
+  (let ((hash-table (wookie::make-wookie-state-hooks)))
+    (is (type-of hash-table)
+	'hash-table)
+    (is (hash-table-test hash-table)
+	'eq)))
 	  
