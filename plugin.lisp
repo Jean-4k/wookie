@@ -79,6 +79,7 @@
 
 
 
+@export
 (defun plugin-config (plugin-name)
   "Return the configuration for a plugin. Setfable."
   (unless (hash-table-p (wookie-state-plugin-config *state*))
