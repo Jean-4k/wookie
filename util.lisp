@@ -5,8 +5,7 @@
 (defpackage :wookie-util
   (:use :cl :wookie-config :blackbird)
   (:shadow blackbird:*debug-on-error*)
-  (:export #:camel-case
-           #:querystringp
+  (:export #:querystringp
            #:set-querystring-hash
            #:querystring-to-hash
            #:body-to-string
@@ -82,6 +81,7 @@
 
 
 
+@export
 (defun camel-case (keyword)
   "Camel case anything that can be converted to a string (string, keyword,
    symbol, etc)."
