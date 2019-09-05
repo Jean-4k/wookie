@@ -1,16 +1,24 @@
 (in-package :wookie)
 
+
+
 (define-condition response-error (wookie-error)
   ((response :initarg :response :reader response-error-response :initform nil))
   (:report (lambda (c s) (format s "Response error: ~a" (response-error-response c))))
   (:documentation "Describes a response error"))
 
+
+
 (define-condition response-already-sent (response-error) ()
   (:report (lambda (c s) (format s "Response already sent: ~a" (response-error-response c))))
   (:documentation "Triggered when a response is attempted more than once."))
 
+
+
 (defparameter *wookie-version* (asdf:component-version (asdf:find-system :wookie))
   "Holds Wookie's current version.")
+
+
 
 (defclass request ()
   ((socket :accessor request-socket :initarg :socket :initform nil)
@@ -27,6 +35,8 @@
    (http :accessor request-http :initarg :http :initform nil))
   (:documentation "A class describing a request, passed to every route."))
 
+
+
 (defclass response ()
   ((headers :accessor response-headers :initarg :headers :initform nil)
    (request :accessor response-request :initarg :request :initform nil)
@@ -34,15 +44,23 @@
    (chunk-stream :accessor response-chunk-stream :initarg :chunk-stream :initform nil))
   (:documentation "A class holding information about a response to the client."))
 
+
+
 (defgeneric get-socket (request/response)
   (:documentation
     "Grabs the current socket for the request/response given."))
 
+
+
 (defmethod get-socket ((request request))
   (request-socket request))
 
+
+
 (defmethod get-socket ((response response))
   (get-socket (response-request response)))
+
+
 
 (defmacro with-chunking (request (chunk-data last-chunk-p &key store-body ((:start start-var)) ((:end end-var))) &body body)
   "Set up a listener for chunked data in a chunk-enabled router. This macro
@@ -82,6 +100,8 @@
            (funcall (request-body-callback-setcb ,request-var) (request-body-callback ,request-var))
            (setf (request-body-callback-setcb ,request-var) nil))))))
 
+
+
 (defun add-default-headers (headers)
   "Add a number of default headers to a headers plist. If one of the default
    headers is already present, do NOT overwrite it. This allows the app to set
@@ -93,6 +113,8 @@
   (unless *hide-version*
     (set-header headers :server (format nil "Wookie (~a)" *wookie-version*)))
   headers)
+
+
 
 (defun get-log-uri (uri)
   "Given a quri object, return a string of the printable version for logging."
@@ -116,6 +138,8 @@
                                        :initial-value ""))
                   str)))
     str))
+
+
 
 (defun send-response (response &key (status 200) headers (body nil body-specified-p) (close nil close-specified-p))
   "Send a response to an incoming request. Takes :status, :headers, and :body
@@ -219,6 +243,8 @@
         (setf (response-finished-p response) t)
         response))))
 
+
+
 (defun start-response (response &key (status 200) headers)
   "Start a response to the client, but do not specify body content (or close the
    connection). Return a chunked (chunga) stream that can be used to send the
@@ -239,6 +265,8 @@
     (setf (chunga:chunked-stream-output-chunking-p chunked-stream) t
           (response-chunk-stream response) chunked-stream)
     chunked-stream))
+
+
 
 (defun finish-response (response &key (close nil close-specified-p))
   "Given the stream passed back from start-response, finalize the response (send
@@ -273,9 +301,10 @@
                     (as:close-socket socket)))))
   response)
 
+
+
 (defun send-100-continue (response)
   "Send a 100 Continue header on the given response object."
   (let ((sock (request-socket (response-request response))))
     (as:write-socket-data sock (format nil "HTTP/1.1 100 Continue~c~c~c~c"
                                        #\return #\newline #\return #\newline))))
-
