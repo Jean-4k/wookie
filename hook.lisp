@@ -97,6 +97,7 @@
 
 
 
+@export
 (defun remove-hook (hook function/hook-name)
   "Remove a hook from a set of hooks by its function reference OR by the hook's
    name given at add-hook."
