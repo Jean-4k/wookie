@@ -19,6 +19,7 @@
 
 
 
+@export
 (define-condition route-not-found (route-error) ()
   (:report (lambda (c s) (format s "Routing error: route not found for ~s" (route-error-resource c))))
   (:documentation "Describes a route not found error."))

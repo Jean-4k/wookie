@@ -10,7 +10,6 @@
            #:get-header
            #:set-header
            
-           #:route-not-found
            #:clear-routes
            #:clear-route
            #:next-route
