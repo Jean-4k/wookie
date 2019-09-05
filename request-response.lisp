@@ -11,6 +11,7 @@
 
 
 
+@export
 (define-condition response-already-sent (response-error) ()
   (:report (lambda (c s) (format s "Response already sent: ~a" (response-error-response c))))
   (:documentation "Triggered when a response is attempted more than once."))

@@ -9,7 +9,6 @@
            #:set-header
            
            #:response-error-response
-           #:response-already-sent
            #:request
            #:request-socket
            #:request-method
