@@ -2,7 +2,7 @@
 
 
 
-(plan 1)
+(plan 2)
 
 
 
@@ -12,6 +12,7 @@
 
 
 
-
-
-
+(subtest "make-wookie-state"
+  (let ((state (wookie::make-wookie-state)))
+    (is (type-of state)
+	'wookie-state)))

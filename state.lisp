@@ -46,6 +46,12 @@
 
 
 
+(defun make-wookie-state ()
+  "Create a wookie-state-object."
+  (make-instance 'wookie-state))
+
+
+
 @export
-(defvar *state* (make-instance 'wookie-state)
+(defvar *state* (make-wookie-state)
   "Holds all global state/context for Wookie.")
