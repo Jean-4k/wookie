@@ -5,8 +5,7 @@
 (defpackage :wookie-util
   (:use :cl :wookie-config :blackbird)
   (:shadow blackbird:*debug-on-error*)
-  (:export #:set-querystring-hash
-           #:querystring-to-hash
+  (:export #:querystring-to-hash
            #:body-to-string
            #:getf-reverse
            #:lookup-status-text))
@@ -126,6 +125,7 @@
 
 
 
+@export
 (defun set-querystring-hash (hash key val)
   "Set the key of a querystring var into a hash, creating as many nested hashes
    as needed. For instance:
