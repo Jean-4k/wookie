@@ -5,8 +5,7 @@
 (defpackage :wookie-util
   (:use :cl :wookie-config :blackbird)
   (:shadow blackbird:*debug-on-error*)
-  (:export #:map-plist
-           #:camel-case
+  (:export #:camel-case
            #:querystringp
            #:set-querystring-hash
            #:querystring-to-hash
@@ -67,6 +66,7 @@
 
 
 
+@export
 (defun map-plist (plist fn)
   "Iterate over a plist"
   (let ((result nil))
