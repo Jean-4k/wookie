@@ -1,3 +1,4 @@
+(annot:enable-annot-syntax)
 (in-package :wookie)
 
 
@@ -83,6 +84,7 @@
 
 
 
+@export
 (defun add-hook (hook function &optional hook-name)
   "Add a hook into the wookie system. Hooks will be run in the order they were
    added."
