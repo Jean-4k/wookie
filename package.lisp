@@ -10,7 +10,6 @@
            
            #:response-error-response
 
-           #:unload-plugin
            #:defplugin
            #:defplugfun
 

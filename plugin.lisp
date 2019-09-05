@@ -46,6 +46,7 @@
 
 
 
+@export
 (defun unload-plugin (plugin-name)
   "Unload a plugin from the wookie system. If it's currently registered, its
    unload-function will be called.
