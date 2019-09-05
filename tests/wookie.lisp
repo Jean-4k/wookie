@@ -2,7 +2,7 @@
 
 
 
-(plan 3)
+(plan 5)
 
 
 
@@ -40,4 +40,13 @@
 	'hash-table)
     (is (hash-table-test hash-table)
 	'eq)))
-	  
+
+
+
+(subtest "make-wookie-state without hooks."
+  (let ((hooks (wookie-state-hooks
+		(wookie::make-wookie-state))))
+    (if (eq (type-of hooks) 'hash-table)
+	(is (hash-table-test hooks)
+	    'eq)
+	(fail "hooks must be a hash-table."))))

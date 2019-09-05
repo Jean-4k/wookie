@@ -46,17 +46,17 @@
 
 
 
-(defun make-wookie-state (&key hooks)
-  "Create a wookie-state-object."
-  (make-instance 'wookie-state
-		 :hooks hooks))
-
-
-
 (defun make-wookie-state-hooks ()
   "Initialize a wookie-state slot."
   (make-hash-table :test #'eq
 		   :size 10))
+
+
+
+(defun make-wookie-state (&key (hooks (make-wookie-state-hooks)))
+  "Create a wookie-state-object."
+  (make-instance 'wookie-state
+		 :hooks hooks))
 
 
 
