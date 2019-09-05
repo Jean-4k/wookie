@@ -148,6 +148,7 @@
 
 
 
+@export
 (defun send-response (response &key (status 200) headers (body nil body-specified-p) (close nil close-specified-p))
   "Send a response to an incoming request. Takes :status, :headers, and :body
    keyword arguments, which together form an entire response.
