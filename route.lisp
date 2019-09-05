@@ -167,6 +167,7 @@
 
 
 
+@export
 (defun clear-route (method resource-str)
   "Clear out a route in the routing table."
   (vom:debug1 "(route) Clear route ~s" resource-str)

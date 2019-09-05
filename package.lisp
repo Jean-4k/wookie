@@ -10,7 +10,6 @@
            #:get-header
            #:set-header
            
-           #:clear-route
            #:next-route
            #:defroute
            #:with-vhost
