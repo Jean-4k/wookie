@@ -9,7 +9,6 @@
            #:set-header
            
            #:response-error-response
-           #:response
            #:finish-response
            #:send-100-continue
 
