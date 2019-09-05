@@ -5,8 +5,7 @@
 (defpackage :wookie-util
   (:use :cl :wookie-config :blackbird)
   (:shadow blackbird:*debug-on-error*)
-  (:export #:querystring-to-hash
-           #:body-to-string
+  (:export #:body-to-string
            #:getf-reverse
            #:lookup-status-text))
 
@@ -173,6 +172,7 @@
 
 
 
+@export
 (defun querystring-to-hash (querystring)
   "Convert a querystring into a hash table."
   (if querystring
