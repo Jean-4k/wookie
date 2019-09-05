@@ -1,10 +1,14 @@
 (in-package :wookie)
 
+
+
 (define-condition wookie-error (error)
   ((msg :initarg :msg :reader wookie-error-msg :initform nil)
    (socket :initarg :socket :reader wookie-error-socket :initform nil))
   (:report (lambda (c s) (format s "Wookie error: ~a" (wookie-error-msg c))))
   (:documentation "Describes a basic error while processing. Meant to be extended."))
+
+
 
 (defun main-event-handler (event socket &optional event-cb)
   "Handle socket events/conditions that crop up during processing."
@@ -52,6 +56,8 @@
       (when (and (typep event 'as:tcp-eof)
                  (typep (as:tcp-socket event) 'as:socket))
         (setf (as:socket-data (as:tcp-socket event)) nil)))))
+
+
 
 (defun listener-event-handler (ev event-cb)
   "A wrapper around main-event-handler, useful for listeners to tie into."
