@@ -10,12 +10,17 @@
 
 
 
+@export
+(define-condition wookie-state-hooks-not-set (error)
+  ())
+
+
+
 @export-class
 (defclass wookie-state ()
   ((hooks
     :initarg :hooks
-    :initform (make-hash-table :size 10
-			       :test #'eq)
+    :initform (error 'wookie-state-hooks-not-set)
     :accessor wookie-state-hooks
     :documentation "Holds the hook callbacks associated with this context.")
    (plugins

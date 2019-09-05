@@ -50,3 +50,9 @@
 	(is (hash-table-test hooks)
 	    'eq)
 	(fail "hooks must be a hash-table."))))
+
+
+
+(subtest "wookie-state hooks initform is an error."
+  (is-error (make-instance 'wookie-state)
+	    'wookie-state-hooks-not-set))
