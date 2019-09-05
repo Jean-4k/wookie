@@ -1,5 +1,7 @@
 (in-package :wookie)
 
+
+
 (defun clear-hooks (&optional hook)
   "Clear all hooks (default) or optionally a specific hook type."
   (vom:debug1 "(hook) Clearing ~a" (if hook
@@ -8,6 +10,8 @@
   (if hook
       (setf (gethash hook (wookie-state-hooks *state*)) nil)
       (setf (wookie-state-hooks *state*) (make-hash-table :size 10 :test #'eq))))
+
+
 
 (defun run-hooks (hook &rest args)
   "Run all hooks of a specific type. Returns a future that is finished with no
@@ -54,6 +58,8 @@
                 (push ret collected-promises)))))
         (resolve (blackbird:all collected-promises))))))
 
+
+
 (defmacro do-run-hooks ((socket) run-hook-cmd &body body)
   "Run a number of hooks, catch any errors while running said hooks, and if an
    error occurs, clear out all traces of the current request (specified on the
@@ -75,6 +81,8 @@
                ;; should suffice as far as garbage collection goes.
                (setup-parser ,sock)))))))
 
+
+
 (defun add-hook (hook function &optional hook-name)
   "Add a hook into the wookie system. Hooks will be run in the order they were
    added."
@@ -84,6 +92,8 @@
   ;; append instead of push since we want them to run in the order they were added
   (alexandria:appendf (gethash hook (wookie-state-hooks *state*))
                       (list (list :function function :name hook-name))))
+
+
 
 (defun remove-hook (hook function/hook-name)
   "Remove a hook from a set of hooks by its function reference OR by the hook's
@@ -99,4 +109,3 @@
                                (eq name function/hook-name))))
                        (gethash hook (wookie-state-hooks *state*)))))
       (setf (gethash hook (wookie-state-hooks *state*)) new-hooks))))
-
