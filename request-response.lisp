@@ -51,6 +51,7 @@
 
 
 
+@export
 (defgeneric get-socket (request/response)
   (:documentation
     "Grabs the current socket for the request/response given."))

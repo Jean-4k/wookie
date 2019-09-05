@@ -10,7 +10,6 @@
            
            #:response-error-response
            #:response
-           #:get-socket
            #:with-chunking
            #:send-response
            #:start-response
