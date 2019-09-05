@@ -14,6 +14,7 @@
 
 
 
+@export
 (defvar *plugin-folders* (list "./wookie-plugins/"
                                (asdf:system-relative-pathname :wookie #P"core-plugins/"))
   "A list of directories where Wookie plugins can be found.")
