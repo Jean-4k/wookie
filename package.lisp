@@ -10,8 +10,6 @@
            
            #:response-error-response
 
-           #:start-server
-
            #-(or :wookie-no-ssl) #:ssl-listener
            #-(or :wookie-no-ssl) #:listener-certificate
            #-(or :wookie-no-ssl) #:listener-key

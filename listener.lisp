@@ -13,6 +13,7 @@
 
 
 
+@export
 (defgeneric start-server (listener)
   (:documentation
     "Start Wookie with the given listener."))
