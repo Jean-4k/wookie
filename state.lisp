@@ -46,9 +46,10 @@
 
 
 
-(defun make-wookie-state ()
+(defun make-wookie-state (&key hooks)
   "Create a wookie-state-object."
-  (make-instance 'wookie-state))
+  (make-instance 'wookie-state
+		 :hooks hooks))
 
 
 
