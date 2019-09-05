@@ -96,6 +96,7 @@
 
 
 
+@export
 (defun plugin-request-data (plugin-name request)
   "Retrieve the data stored into a request object for the plugin-name (keyword)
    plugin. This function is setfable."
