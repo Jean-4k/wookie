@@ -253,6 +253,7 @@
 
 
 
+@export
 (defun start-response (response &key (status 200) headers)
   "Start a response to the client, but do not specify body content (or close the
    connection). Return a chunked (chunga) stream that can be used to send the

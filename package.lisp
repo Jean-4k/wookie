@@ -10,7 +10,6 @@
            
            #:response-error-response
            #:response
-           #:start-response
            #:finish-response
            #:send-100-continue
 
