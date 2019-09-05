@@ -243,6 +243,7 @@
 
 
 
+@export
 (defmacro with-vhost (host &body body)
   "Simple wrapper that makes all defroutes in the body bind to a specific vhost:
 

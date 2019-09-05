@@ -10,8 +10,6 @@
            #:get-header
            #:set-header
            
-           #:with-vhost
-
            #:clear-hooks
            #:add-hook
            #:remove-hook
