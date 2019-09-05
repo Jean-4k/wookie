@@ -1,7 +1,8 @@
+(annot:enable-annot-syntax)
 (in-package :wookie)
 
 
-
+#-(or :wookie-no-ssl) @export-class
 (defclass ssl-listener (listener)
   ((certificate :accessor listener-certificate :initarg :certificate :initform nil)
    (key :accessor listener-key :initarg :key :initform nil)

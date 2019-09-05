@@ -8,9 +8,4 @@
   (:export #:get-header
            #:set-header
            
-           #:response-error-response
-
-           #-(or :wookie-no-ssl) #:ssl-listener
-           #-(or :wookie-no-ssl) #:listener-certificate
-           #-(or :wookie-no-ssl) #:listener-key
-           #-(or :wookie-no-ssl) #:listener-password))
+           #:response-error-response))
