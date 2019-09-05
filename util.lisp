@@ -3,7 +3,9 @@
 
 
 (defpackage :wookie-util
-  (:use :cl :wookie-config :blackbird)
+  (:use #:cl
+	#:wookie-config
+	#:blackbird)
   (:shadow blackbird:*debug-on-error*))
 
 
