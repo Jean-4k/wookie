@@ -1,29 +1,41 @@
 (in-package :wookie)
 
+
+
 (define-condition use-next-route () ()
   (:documentation
     "Signals to the routing system to load the next route after the one loaded.
      can be used to set up route load chains based on criteria not sent directly
      to find-route."))
 
+
+
 (define-condition route-error (wookie-error)
   ((resource :initarg :resource :reader route-error-resource :initform nil))
   (:report (lambda (c s) (format s "Routing error: ~s" (route-error-resource c))))
   (:documentation "Describes a general routing error."))
 
+
+
 (define-condition route-not-found (route-error) ()
   (:report (lambda (c s) (format s "Routing error: route not found for ~s" (route-error-resource c))))
   (:documentation "Describes a route not found error."))
 
+
+
 (defvar *default-vhost* nil
   "Defines the default virtualhost that routes use (unless explicitely stated
    otherwise). Nil means no vhost (respond to all requests).")
+
+
 
 (defun clear-routes ()
   "Clear out all routes."
   (vom:debug1 "(route) Clearing routes")
   (setf (wookie-state-routes *state*) (make-array 0 :adjustable t :fill-pointer t))
   (routes-modified))
+
+
 
 (defun make-route (method resource fn &key regex case-sensitive allow-chunking buffer-body suppress-100 vhost priority)
   "Simple wrapper to make a route object from a set of args."
@@ -43,10 +55,14 @@
           :vhost vhost
           :priority (or priority 0))))
 
+
+
 (defun next-route ()
   "Lets the routing system know to re-route the current request, excluding this
    route from the available options."
   (signal 'use-next-route))
+
+
 
 (defun find-route (method resource &key exclude host)
   "Given a method and a resource, find the best matching route."
@@ -80,9 +96,13 @@
               (setf (getf route :curried-route) curried-fn)
               (return-from find-route route))))))))
 
+
+
 (defun routes-modified ()
   "Reset ordered route cache after routing changes"
   (setf (wookie-state-ordered-routes *state*) nil))
+
+
 
 (defun ordered-routes ()
   "Return the array of routes ordered by their priority,
@@ -93,11 +113,15 @@
                          #'> :key #'(lambda (route)
                                       (getf route :priority))))))
 
+
+
 (defun add-route (new-route)
   "Add a new route to the table."
   (vector-push-extend new-route (wookie-state-routes *state*))
   (routes-modified)
   (length (wookie-state-routes *state*)))
+
+
 
 (defun method-equal (method1 method2)
   "Test two route methods (kewords or lists of keywords) for equality."
@@ -108,11 +132,15 @@
                      (sort (copy-list method2) #'string<))))
       nil))
 
+
+
 (defun route-equal (route method resource-str)
   "Test the property values of :method and :resource-str in a route
    plist for equality against a supplied method and resource-str."
   (and (method-equal (getf route :method) method)
        (string= (getf route :resource-str) resource-str)))
+
+
 
 (defun upsert-route (new-route)
   "Add a new route to the table. If a route already exists with the same method
@@ -133,6 +161,8 @@
     (routes-modified)
     (length (wookie-state-routes *state*))))
 
+
+
 (defun clear-route (method resource-str)
   "Clear out a route in the routing table."
   (vom:debug1 "(route) Clear route ~s" resource-str)
@@ -144,6 +174,8 @@
     (setf (wookie-state-routes *state*) new-routes)
     (routes-modified)
     (values)))
+
+
 
 (defmacro defroute ((method resource &key (regex t) (case-sensitive t)
                                           chunk (buffer-body t) suppress-100
@@ -201,6 +233,8 @@
        (if ,replace
            (upsert-route ,new-route)
            (add-route ,new-route)))))
+
+
 
 (defmacro with-vhost (host &body body)
   "Simple wrapper that makes all defroutes in the body bind to a specific vhost:
