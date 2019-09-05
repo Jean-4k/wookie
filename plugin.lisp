@@ -203,6 +203,7 @@
 
 
 
+@export
 (defun load-plugins (&key ignore-loading-errors (use-quicklisp t))
   "Load all plugins under the *plugin-folder* fold (set with set-plugin-folder).
    There is also the option to compile the plugins (default nil)."
