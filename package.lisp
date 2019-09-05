@@ -5,9 +5,7 @@
 	#:blackbird
 	#:annot.class)
   (:shadow blackbird:*debug-on-error*)
-  (:export #:*state*
-           
-           #:get-header
+  (:export #:get-header
            #:set-header
            
            #:response-error
