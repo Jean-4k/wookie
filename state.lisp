@@ -12,7 +12,11 @@
 
 @export
 (define-condition wookie-state-hooks-not-set (error)
-  ())
+  ()
+  (:report (lambda (condition stream)
+	     (declare (ignore condition))
+	     (format stream "Hooks not set. Please use functions make-wookie-state or make-wookie-state-hooks.~&")))
+  (:documentation "Raised when hooks slot of wookie-state is not set."))
 
 
 
