@@ -10,7 +10,6 @@
            
            #:response-error-response
            #:response
-           #:with-chunking
            #:send-response
            #:start-response
            #:finish-response

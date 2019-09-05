@@ -68,6 +68,7 @@
 
 
 
+@export
 (defmacro with-chunking (request (chunk-data last-chunk-p &key store-body ((:start start-var)) ((:end end-var))) &body body)
   "Set up a listener for chunked data in a chunk-enabled router. This macro
    takes a request object, the names of the chunk-data/finishedp arguments
