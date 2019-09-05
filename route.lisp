@@ -1,3 +1,4 @@
+(annot:enable-annot-syntax)
 (in-package :wookie)
 
 
@@ -10,6 +11,7 @@
 
 
 
+@export
 (define-condition route-error (wookie-error)
   ((resource :initarg :resource :reader route-error-resource :initform nil))
   (:report (lambda (c s) (format s "Routing error: ~s" (route-error-resource c))))
