@@ -11,13 +11,20 @@
            #:body-to-string
            #:getf-reverse
            #:lookup-status-text))
+
+
+
 (in-package :wookie-util)
+
+
 
 (defun getf* (plist key &optional default)
   "Similar to GETF but compares keys with string-equal."
   (alexandria:doplist (k v plist default)
     (when (string-equal key k)
       (return-from getf* v))))
+
+
 
 (defmacro get-header (header-collection key)
   "Get a value from a header collection."
@@ -34,6 +41,8 @@
                              ,s-key
                              (intern (string-upcase (string ,s-key)) :keyword))))
                 (getf* ,headers key)))))))
+
+
 
 (defmacro set-header (header-collection key value)
   "Set a value into a header collection."
@@ -52,6 +61,8 @@
                              (intern (string-upcase (string ,s-key)) :keyword))))
                 (setf (getf ,header-collection key) ,value)))))))
 
+
+
 (defun map-plist (plist fn)
   "Iterate over a plist"
   (let ((result nil))
@@ -64,6 +75,8 @@
         (let ((res (funcall fn header value)))
           (when res (push res result)))))
     (reverse result)))
+
+
 
 (defun camel-case (keyword)
   "Camel case anything that can be converted to a string (string, keyword,
@@ -80,13 +93,19 @@
           (setf (aref lower i) (aref (string-upcase (string c)) 0)))))
     lower))
 
+
+
 (defparameter *scanner-querystring-p*
   (cl-ppcre:create-scanner "^([a-z0-9-_\\[\\]]+(=([^&]+)?)?(&+|$))+" :case-insensitive-mode t)
   "Detects a querystring.")
 
+
+
 (defun querystringp (querystring)
   "Detects if the given string is an HTTP querystring."
   (cl-ppcre:scan *scanner-querystring-p* querystring))
+
+
 
 (defun get-querystring-hash-r (container subkeys val)
   "Recursively build a tree of hashes based on a given set of subkeys in a query
@@ -101,6 +120,8 @@
         (setf (gethash key container) (get-querystring-hash-r newcontainer (cdr subkeys) val)))
       container)))
 
+
+
 (defun set-querystring-hash (hash key val)
   "Set the key of a querystring var into a hash, creating as many nested hashes
    as needed. For instance:
@@ -112,6 +133,8 @@
   (let* ((subkeys (cl-ppcre:split "(\\]\\[|\\[|\\])" key))
          (subkeys (remove-if #'null subkeys)))
     (get-querystring-hash-r hash subkeys val)))
+
+
 
 (defun convert-hash-vectors (hash)
   "Given a hash table, look for all hashes whos keys are a set of indexes
@@ -144,6 +167,8 @@
             (setf (gethash k hash) (convert-hash-vectors v)))
           hash))))
 
+
+
 (defun querystring-to-hash (querystring)
   "Convert a querystring into a hash table."
   (if querystring
@@ -162,6 +187,8 @@
           (print-hash v (+ 2 indent)))
     (format t "[~a] => ~s~%" k v))))
 
+
+
 (defun body-to-string (body-bytes content-type-header)
   "Given a byte vector of HTTP body data and the value of a Content-Type header,
    convert the body to a string via the charset provided in the header. If a
@@ -176,6 +203,8 @@
       (error ()
         (babel:octets-to-string body-bytes :encoding :iso-8859-1)))))
 
+
+
 (defun getf-reverse (plist key)
   "Like getf, except the VALUE comes before the KEY:
      '(:value1 :key1 :value2 :key2)
@@ -184,6 +213,8 @@
     (when (eq key (cadr plist))
       (return-from getf-reverse (car plist)))
     (setf plist (cddr plist))))
+
+
 
 (defun lookup-status-text (status-code)
   "Get the HTTP standard text that goes along with a status code."
@@ -266,4 +297,3 @@
     (598 "Network Read Timeout Error")
     (599 "Network Connect Timeout Error")
     (t "Unknown Status")))
-
