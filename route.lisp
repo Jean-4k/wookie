@@ -61,6 +61,7 @@
 
 
 
+@export
 (defun next-route ()
   "Lets the routing system know to re-route the current request, excluding this
    route from the available options."
