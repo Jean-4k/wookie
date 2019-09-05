@@ -13,31 +13,33 @@
 @export-class
 (defclass wookie-state ()
   ((hooks
-     :accessor wookie-state-hooks
-     :initarg :hooks
-     :initform (make-hash-table :size 10 :test #'eq)
-     :documentation "Holds the hook callbacks associated with this context.")
+    :initarg :hooks
+    :initform (make-hash-table :size 10
+			       :test #'eq)
+    :accessor wookie-state-hooks
+    :documentation "Holds the hook callbacks associated with this context.")
    (plugins
-     :accessor wookie-state-plugins
-     :initarg :plugins
-     :initform (make-hash-table :test #'eq)
-     :documentation "Holds the loaded plugins and their associated data for this context")
+    :initarg :plugins
+    :initform (make-hash-table :test #'eq)
+    :accessor wookie-state-plugins
+    :documentation "Holds the loaded plugins and their associated data for this context")
    (plugin-config
-     :accessor wookie-state-plugin-config
-     :initarg :plugin-config
-     :initform nil
-     :documentation "Holds all plugin configuration.")
+    :initarg :plugin-config
+    :initform nil
+    :accessor wookie-state-plugin-config
+    :documentation "Holds all plugin configuration.")
    (routes
-     :accessor wookie-state-routes
-     :initarg :routes
-     :initform (make-array 0 :adjustable t :fill-pointer t)
-     :documentation "Holds the routes this context uses.")
+    :initarg :routes
+    :initform (make-array 0 :adjustable t
+			  :fill-pointer t)
+    :accessor wookie-state-routes
+    :documentation "Holds the routes this context uses.")
    (ordered-routes
-     :accessor wookie-state-ordered-routes
-     :initform nil
-     :documentation "Routes ordered according to their priority (cached value)"))
+    :initform nil
+    :accessor wookie-state-ordered-routes
+    :documentation "Routes ordered according to their priority (cached value)"))
   (:documentation
-    "wookie-state holds all global data/state used by Wookie. It's purpose is to
+   "wookie-state holds all global data/state used by Wookie. It's purpose is to
      make threading Wookie easier by allowing the declaration of one
      thread-local variable instad of many."))
 
