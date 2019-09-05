@@ -41,6 +41,7 @@
 
 
 
+@export-class
 (defclass response ()
   ((headers :accessor response-headers :initarg :headers :initform nil)
    (request :accessor response-request :initarg :request :initform nil)

@@ -10,9 +10,6 @@
            
            #:response-error-response
            #:response
-           #:response-request
-           #:response-headers
-           #:response-finished-p
            #:get-socket
            #:with-chunking
            #:send-response
