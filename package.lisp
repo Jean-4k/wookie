@@ -1,5 +1,9 @@
 (defpackage :wookie
-  (:use :cl :wookie-config :wookie-util :blackbird :annot.class)
+  (:use #:cl
+	#:wookie-config
+	#:wookie-util
+	#:blackbird
+	#:annot.class)
   (:shadow blackbird:*debug-on-error*)
   (:export #:*state*
            
