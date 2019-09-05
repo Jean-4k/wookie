@@ -10,7 +10,6 @@
            
            #:response-error-response
 
-           #:defplugin
            #:defplugfun
 
            #:listener

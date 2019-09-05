@@ -236,6 +236,7 @@
 
 
 
+@export
 (defmacro defplugin (&rest asdf-defsystem-args)
   "Simple wrapper around asdf:defsystem that maps a plugin-name (hopefully in
    *current-plugin-name*) to the ASDF system the plugin defines."
