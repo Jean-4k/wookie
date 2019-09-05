@@ -32,6 +32,7 @@
 
 
 
+@export
 (defun clear-routes ()
   "Clear out all routes."
   (vom:debug1 "(route) Clearing routes")
