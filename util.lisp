@@ -1,8 +1,11 @@
+(annot:enable-annot-syntax)
+
+
+
 (defpackage :wookie-util
   (:use :cl :wookie-config :blackbird)
   (:shadow blackbird:*debug-on-error*)
-  (:export #:get-header
-           #:set-header
+  (:export #:set-header
            #:map-plist
            #:camel-case
            #:querystringp
@@ -26,6 +29,7 @@
 
 
 
+@export
 (defmacro get-header (header-collection key)
   "Get a value from a header collection."
   (alexandria:with-gensyms (headers s-key)
