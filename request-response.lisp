@@ -313,6 +313,7 @@
 
 
 
+@export
 (defun send-100-continue (response)
   "Send a 100 Continue header on the given response object."
   (let ((sock (request-socket (response-request response))))

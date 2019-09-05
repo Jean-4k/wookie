@@ -9,7 +9,6 @@
            #:set-header
            
            #:response-error-response
-           #:send-100-continue
 
            #:*enabled-plugins*
            #:*plugin-folders*
