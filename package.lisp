@@ -10,10 +10,6 @@
            #:get-header
            #:set-header
            
-           #:clear-hooks
-           #:add-hook
-           #:remove-hook
-
            #:response-error
            #:response-error-response
            #:response-already-sent
