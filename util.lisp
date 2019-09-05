@@ -5,8 +5,7 @@
 (defpackage :wookie-util
   (:use :cl :wookie-config :blackbird)
   (:shadow blackbird:*debug-on-error*)
-  (:export #:querystringp
-           #:set-querystring-hash
+  (:export #:set-querystring-hash
            #:querystring-to-hash
            #:body-to-string
            #:getf-reverse
@@ -105,6 +104,7 @@
 
 
 
+@export
 (defun querystringp (querystring)
   "Detects if the given string is an HTTP querystring."
   (cl-ppcre:scan *scanner-querystring-p* querystring))
