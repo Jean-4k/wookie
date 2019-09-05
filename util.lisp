@@ -4,8 +4,7 @@
 
 (defpackage :wookie-util
   (:use :cl :wookie-config :blackbird)
-  (:shadow blackbird:*debug-on-error*)
-  (:export #:lookup-status-text))
+  (:shadow blackbird:*debug-on-error*))
 
 
 
@@ -222,6 +221,7 @@
 
 
 
+@export
 (defun lookup-status-text (status-code)
   "Get the HTTP standard text that goes along with a status code."
   (case status-code
