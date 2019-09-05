@@ -7,10 +7,6 @@
   (:shadow blackbird:*debug-on-error*)
   (:export #:*state*
            
-           #:wookie-error
-           #:wookie-error-msg
-           #:wookie-error-socket
-
            #:get-header
            #:set-header
            
