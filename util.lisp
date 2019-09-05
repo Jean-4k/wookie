@@ -5,8 +5,7 @@
 (defpackage :wookie-util
   (:use :cl :wookie-config :blackbird)
   (:shadow blackbird:*debug-on-error*)
-  (:export #:body-to-string
-           #:getf-reverse
+  (:export #:getf-reverse
            #:lookup-status-text))
 
 
@@ -195,6 +194,7 @@
 
 
 
+@export
 (defun body-to-string (body-bytes content-type-header)
   "Given a byte vector of HTTP body data and the value of a Content-Type header,
    convert the body to a string via the charset provided in the header. If a
