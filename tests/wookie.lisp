@@ -2,6 +2,8 @@
 
 (plan 1)
 
-(ok t)
+(subtest "*state* is an instance of wookie-state."
+  (is (type-of *state*)
+      'wookie-state))
 
 
