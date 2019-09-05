@@ -5,7 +5,11 @@
 ;;; The parser is the heart of Wookie and holds most of the core logic. Most of
 ;;; the other pieces are icing on the cake.
 
+
+
 (in-package :wookie)
+
+
 
 (defun get-overridden-method (request original-method)
   "Checks if there is a GET var called _method, and if so, uses it instead of
@@ -23,6 +27,8 @@
               new-method
               original-method))
         original-method)))
+
+
 
 (defun setup-parser (sock)
   "This is the main parser function. It's responsible for listening to a socket,
@@ -269,6 +275,8 @@
         ;; attach parser to socket-data so we can deref it in the read callback
         (setf (getf (as:socket-data sock) :parser) parser)))))
 
+
+
 (defun handle-connection (sock)
   "Handles a new connection. Creates a bunch of closures that are passed into an
    http-parse parser which decide amongst themselves, during different points in
@@ -278,6 +286,8 @@
   ;; TODO pass client address info into :connect hook
   (do-run-hooks (sock) (run-hooks :connect sock)
     (setup-parser sock)))
+
+
 
 (defun read-data (sock data)
   "A simple read-cb handler that passes data to the HTTP parser attached to the
@@ -295,4 +305,3 @@
                       (when response
                         (send-response response :status 400 :body "Error parsing client HTTP request")))))))
       (funcall parser data))))
-
