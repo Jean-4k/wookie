@@ -1,7 +1,9 @@
+(annot:enable-annot-syntax)
 (in-package :wookie)
 
 
 
+@export-class
 (defclass listener ()
   ((bind :accessor listener-bind :initarg :bind :initform nil)
    (port :accessor listener-port :initarg :port :initform 80)

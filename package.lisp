@@ -10,10 +10,6 @@
            
            #:response-error-response
 
-           #:listener
-           #:listener-bind
-           #:listener-port
-           #:listener-backlog
            #:start-server
 
            #-(or :wookie-no-ssl) #:ssl-listener
