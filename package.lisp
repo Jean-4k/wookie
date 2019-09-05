@@ -9,17 +9,6 @@
            #:set-header
            
            #:response-error-response
-           #:request-socket
-           #:request-method
-           #:request-resource
-           #:request-headers
-           #:request-uri
-           #:request-data
-           #:request-store-body
-           #:request-body
-           #:request-plugin-data
-           #:request-body-callback
-           #:request-http
            #:response
            #:response-request
            #:response-headers
