@@ -30,47 +30,17 @@
 
 
 
-(defun setup-parser (sock)
-  "This is the main parser function. It's responsible for listening to a socket,
-   setting up an HTTP parser for it, handling the different events/callbacks the
-   HTTP parser throws at it, dispatching routes, handling body chunking, etc. A
-   lot of this is done via shared state which all lives under this function's
-   top-level (let) form, and a set of local functions which read/modify this
-   shared state.
-
-   This function is at the core of Wookie's being.
-
-   Note that setup-parser can be called multiple times on the same socket. The
-   only reason to do this is if a request/response has come and gone on the
-   socket and you wish to make the socket available for another request. Wookie
-   handles all of this automatically."
-  (let* ((http (fast-http:make-http-request))
-         (route-path nil)
-         (route nil)  ; holds the current route, filled in below once we get headers
-         (route-dispatched nil)
-         (error-occurred-p nil)
-         (request (make-instance 'request
-				 :socket sock
-				 :http http))
-         (response (make-instance 'response
-				  :request request))
-         (request-body-buffer nil)
-         (body-buffer (fast-io:make-output-buffer))
-         (body-finished-p nil))
-    (setf (as:socket-data sock)
-	  (list :request request
-		:response response))
-    (labels ((dispatch-route ()
-               "Dispatch the route under `route`. This not only handles calling
-                the route's main function, but also handles use-next-route
-                conditions and setting up intricate logic for resilient body
-                chunking. It also runs the :pre-route and :post-route hooks."
-               ;; dispatch the current route, but only if we haven't already done so
-               (when route-dispatched
-                 (return-from dispatch-route))
-               (setf route-dispatched
-		     t)
-               (do-run-hooks (sock) (run-hooks :pre-route
+(defun dispatch-route (route-dispatched sock request response route)
+  "Dispatch the route under `route`. This not only handles calling
+   the route's main function, but also handles use-next-route
+   conditions and setting up intricate logic for resilient body
+   chunking. It also runs the :pre-route and :post-route hooks."
+  ;; dispatch the current route, but only if we haven't already done so
+  (when route-dispatched
+    (return-from dispatch-route))
+  (setf route-dispatched
+	t)
+  (do-run-hooks (sock) (run-hooks :pre-route
 					       request
 					       response)
                  (block skip-route
@@ -158,7 +128,40 @@
 						   request
 						   response)
 		     nil))))
-             (header-callback (headers)
+
+
+
+(defun setup-parser (sock)
+  "This is the main parser function. It's responsible for listening to a socket,
+   setting up an HTTP parser for it, handling the different events/callbacks the
+   HTTP parser throws at it, dispatching routes, handling body chunking, etc. A
+   lot of this is done via shared state which all lives under this function's
+   top-level (let) form, and a set of local functions which read/modify this
+   shared state.
+
+   This function is at the core of Wookie's being.
+
+   Note that setup-parser can be called multiple times on the same socket. The
+   only reason to do this is if a request/response has come and gone on the
+   socket and you wish to make the socket available for another request. Wookie
+   handles all of this automatically."
+  (let* ((http (fast-http:make-http-request))
+         (route-path nil)
+         (route nil)  ; holds the current route, filled in below once we get headers
+         (route-dispatched nil)
+         (error-occurred-p nil)
+         (request (make-instance 'request
+				 :socket sock
+				 :http http))
+         (response (make-instance 'response
+				  :request request))
+         (request-body-buffer nil)
+         (body-buffer (fast-io:make-output-buffer))
+         (body-finished-p nil))
+    (setf (as:socket-data sock)
+	  (list :request request
+		:response response))
+    (labels ((header-callback (headers)
                "Called when our HTTP parser graciously passes us a block of
                 parsed headers. Allows us to find which route we're going to
                 dispatch to, and if needed, set up chunking *before* the body
@@ -214,7 +217,11 @@
                        ;; as one big chunk.
                        (when (and found-route
                                   (getf found-route :allow-chunking))
-                         (dispatch-route)))))
+                         (dispatch-route route-dispatched
+					 sock
+					 request
+					 response
+					 route)))))
                  ;; pipe all uncaught errors we get to the main event handler
                  ;; (with our socket object).
                  ;;
@@ -289,7 +296,11 @@
                (body-callback (make-array 0 :element-type 'cl-async:octet) 0 0)
                ;; make sure we always dispatch at the end.
                (do-run-hooks (sock) (run-hooks :body-complete request)
-                 (dispatch-route))))
+                 (dispatch-route route-dispatched
+				 sock
+				 request
+				 response
+				 route))))
       ;; make an HTTP parser. will be attached to the socket and will be
       ;; responsible for running all of the above callbacks directly as data
       ;; filters in from the read callback.
