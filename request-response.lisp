@@ -36,7 +36,8 @@
    (plugin-data :accessor request-plugin-data :initarg :plugin-data :initform nil)
    (body-callback :accessor request-body-callback :initarg :body-callback :initform nil)
    (body-callback-setcb :accessor request-body-callback-setcb :initarg :body-callback-setcb :initform nil)
-   (http :accessor request-http :initarg :http :initform nil))
+   (http :accessor request-http :initarg :http :initform nil)
+   (parser :accessor request-parser :initarg :parser :initform nil))
   (:documentation "A class describing a request, passed to every route."))
 
 

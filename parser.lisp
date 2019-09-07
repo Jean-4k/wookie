@@ -30,7 +30,7 @@
 
 
 
-(defun dispatch-route (route-dispatched sock request response route)
+(defun dispatch-route (parser route-dispatched sock request response route)
   "Dispatch the route under `route`. This not only handles calling
    the route's main function, but also handles use-next-route
    conditions and setting up intricate logic for resilient body
@@ -56,20 +56,21 @@
                                   (let ((request-body-cb (request-body-callback request)))
                                     (when (and (getf route :allow-chunking)
                                                (getf route :buffer-body))
-                                      (if (and body-buffer
-                                               body-finished-p)
+                                      (if (and (body-buffer parser)
+                                               (body-finished-p parser))
                                           ;; the body has finished processing, either
                                           ;; send it into the chunking function or set
                                           ;; up a callback that is called when
                                           ;; with-chunking is called that pumps the body
                                           ;; into the newly setup chunking callback
-                                          (let ((body (fast-io:finish-output-buffer body-buffer)))
+                                          (let ((body (fast-io:finish-output-buffer
+						       (body-buffer parser))))
                                             (if request-body-cb
                                                 ;; with-chunking already called, great. pass
                                                 ;; in the body
                                                 (progn
                                                   (funcall request-body-cb body t)
-                                                  (setf body-buffer nil))
+                                                  (setf (body-buffer parser) nil))
                                                 ;; set up a callback that fires when
                                                 ;; with-chunking is called. it'll pass the
                                                 ;; body into the with-chunking callback
@@ -85,17 +86,18 @@
                                           ;; fires with-chunking with the body.
                                           (setf (request-body-callback-setcb request)
 						(lambda (body-cb)
-                                                  (when body-buffer
-                                                    (let ((body (fast-io:finish-output-buffer body-buffer)))
-                                                      (funcall body-cb body body-finished-p)
-                                                      (setf body-buffer nil)))))))))
+                                                  (when (body-buffer parser)
+                                                    (let ((body (fast-io:finish-output-buffer (body-buffer parser))))
+                                                      (funcall body-cb body (body-finished-p parser))
+                                                      (setf (body-buffer parser) nil)))))))))
                                 (progn
                                   (vom:warn "(route) Missing route: ~a ~s"
-					    (request-method request)
-					    route-path)
-                                  (funcall 'main-event-handler (make-instance 'route-not-found
-                                                                              :resource route-path
-                                                                              :socket sock)
+					    (request-method (request parser))
+					    (route-path parser))
+                                  (funcall 'main-event-handler
+					   (make-instance 'route-not-found
+                                                          :resource (route-path parser)
+                                                          :socket sock)
 					   sock)
                                   (return-from skip-route)))))
                      ;; load our route, but if we encounter a use-next-route condition,
@@ -117,7 +119,7 @@
 					    route-exclude)
                                       (setf route
 					    (find-route (fast-http:http-method http)
-                                                        route-path
+                                                        (route-path parser)
                                                         :exclude route-exclude))
                                       (return-from next))))
                                ;; run our route and break the loop if successful
@@ -204,7 +206,6 @@
    dispatch to, and if needed, set up chunking *before* the body
    starts flowing in. Responsible for the :parsed-headers hook."
   (lambda (headers)
-    (vom:debug "HEADER CALLBACK")
     (block header-callback-closure
       (blackbird:catcher
        (let* ((method (fast-http:http-method (http parser)))
@@ -253,7 +254,8 @@
              ;; as one big chunk.
              (when (and found-route
 			(getf found-route :allow-chunking))
-               (dispatch-route route-dispatched
+               (dispatch-route parser
+			       (route-dispatched parser)
 			       sock
 			       (request parser)
 			       (response parser)
@@ -282,7 +284,6 @@
    if the route allows."
   (setf (body-callback-function parser)
 	(lambda (chunk start end)
-	  (vom:debug "BODY CALLBACK")
 	  (block body-callback-closure
 	    (when (error-occurred-p parser)
 	      (return-from body-callback-closure))
@@ -316,7 +317,7 @@
 	      (let ((request-body-cb (request-body-callback
 				      (request parser))))
 		(cond ((and request-body-cb
-			    body-buffer)
+			    (body-buffer parser))
 		       ;; we have a body chunking callback and the body has
 		       ;; been buffering. append the latest chunk to the
 		       ;; buffer and send the entire buffer into the body cb.
@@ -326,6 +327,7 @@
 						    (body-buffer parser)
 						    start
 						    end)
+		       (describe request-body-cb)
 		       (funcall request-body-cb
 				(fast-io:finish-output-buffer
 				 (body-buffer parser))
@@ -361,7 +363,6 @@
   "Called when an entire HTTP request has been parsed. Responsible 
    for the :body-complete hook."
   (lambda ()
-    (vom:debug "FINISH CALLBACK")
     (block finish-callback-closure
       (when (error-occurred-p parser)
 	(return-from finish-callback-closure))
@@ -370,7 +371,7 @@
       ;; set the request body into the request object
       (when (and (request-body-buffer parser)
 		 (request-store-body (request parser)))
-	(setf (request-body request)
+	(setf (request-body (request parser))
 	      (fast-io:finish-output-buffer (request-body-buffer parser)))
 	(setf (request-body-buffer parser)
 	      nil))   ; because i'm paranoid
@@ -381,7 +382,8 @@
 	       0)
       ;; make sure we always dispatch at the end.
       (do-run-hooks (sock) (run-hooks :body-complete (request parser))
-	(dispatch-route (route-dispatched parser)
+	(dispatch-route parser
+			(route-dispatched parser)
 			sock
 			(request parser)
 			(response parser)
@@ -415,6 +417,8 @@
 			:body-callback (body-callback parser sock)
 			:finish-callback (finish-callback parser sock))))
       ;; attach parser to socket-data so we can deref it in the read callback
+      (setf (request-parser (request parser))
+	    parser)
       (setf (getf (as:socket-data sock)
 		  :parser)
 	    http-parser))))

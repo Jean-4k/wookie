@@ -305,3 +305,13 @@
     (598 "Network Read Timeout Error")
     (599 "Network Connect Timeout Error")
     (t "Unknown Status")))
+
+
+
+@export
+(defun hash-table-to-plist (hash-table)
+  (reduce #'append
+	  (loop for key being the hash-keys of hash-table
+	     using (hash-value value)
+	     collect (list (intern (string-upcase key) :keyword)
+			   value))))

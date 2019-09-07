@@ -18,16 +18,22 @@
    the only way to do it without completely exhausting memory."
   (let ((headers (request-headers request)))
     (when (search "multipart/form-data;" (get-header headers "content-type"))
-      (let* ((hash-form-vars (make-hash-table :test #'equal))
+      (let* ((parser (request-parser request))
+	     (hash-form-vars (make-hash-table :test #'equal))
              (hash-file-data (make-hash-table :test #'equal))
              (cur-file nil)
              (field-buffer (cl-async-util:make-buffer))
-             (multi-cb (lambda (field-name field-headers field-meta body-bytes body-complete-p)
+             (multi-cb (lambda (field-name field-headers field-meta body-bytes)
+			 (setf field-headers (hash-table-to-plist field-headers))
+			 (setf field-meta (hash-table-to-plist field-meta))
+			 (setf body-bytes
+			       (flexi-streams::vector-stream-vector body-bytes))
                          (flet ((save-form-data ()
                                   ;; append the data into our tmp field-buffer storage
-                                  (cl-async-util:write-to-buffer body-bytes field-buffer)
+                                  (cl-async-util:write-to-buffer body-bytes
+								 field-buffer)
                                   ;; once this field is complete, convert the body to a string
-                                  (when body-complete-p
+                                  (when (wookie::body-finished-p parser)
                                     (let* ((field-bytes (cl-async-util:buffer-output field-buffer))
                                            (body (body-to-string field-bytes (get-header field-headers "content-type"))))
                                       ;; make sure we honor sub-fields (ie data[user][name])
@@ -58,7 +64,7 @@
                                     ;; if this is that last chunk, close the file, remove
                                     ;; the handle from the file data, and set the file data
                                     ;; into the file-dat hash.
-                                    (when body-complete-p
+                                    (when (wookie::body-finished-p parser)
                                       (close handle)
                                       (remf cur-file :handle)
                                       (setf (gethash field-name hash-file-data) cur-file)
@@ -70,7 +76,8 @@
                            (if (getf field-meta :filename)
                                (save-file-data)
                                (save-form-data)))))
-             (parser (fast-http:make-multipart-parser (get-header headers "content-type") multi-cb)))
+             (parser (fast-http:make-multipart-parser (get-header headers "content-type")
+						      multi-cb)))
         (when parser
           (setf (plugin-request-data :multipart request)
                 (list :hash-form hash-form-vars
@@ -86,7 +93,9 @@
     ;; if we have a parser, feed the chunk data into it. our hashes will be
     ;; populated as the data is decoded
     (when parser
-      (funcall parser chunk start end))))
+      (setf (wookie::body-finished-p (request-parser request))
+	    t)
+      (funcall parser (subseq chunk start end)))))
 
 (defun remove-tmp-files (response request status headers body)
   "Loop over all tmp files uploaded in a request and delete them."
