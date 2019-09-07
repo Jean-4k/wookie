@@ -54,7 +54,9 @@
          (request-body-buffer nil)
          (body-buffer (fast-io:make-output-buffer))
          (body-finished-p nil))
-    (setf (as:socket-data sock) (list :request request :response response))
+    (setf (as:socket-data sock)
+	  (list :request request
+		:response response))
     (labels ((dispatch-route ()
                "Dispatch the route under `route`. This not only handles calling
                 the route's main function, but also handles use-next-route
