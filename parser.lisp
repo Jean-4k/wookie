@@ -104,23 +104,29 @@
                                                 ;; with-chunking is called. it'll pass the
                                                 ;; body into the with-chunking callback
                                                 ;; once set
-                                                (setf (request-body-callback-setcb request) (lambda (body-cb) (funcall body-cb body t)))))
+                                                (setf (request-body-callback-setcb request)
+						      (lambda (body-cb)
+							(funcall body-cb body t)))))
                                           ;; chunking hasn't started yet AND we haven't called
                                           ;; with-chunking yet. this is kind of an edge case,
                                           ;; but it needs to be handled. we set up a callback
                                           ;; that runs once with-chunking is called that
                                           ;; *hopes* the body has finished chunking and if so,
                                           ;; fires with-chunking with the body.
-                                          (setf (request-body-callback-setcb request) (lambda (body-cb)
-                                                                                        (when body-buffer
-                                                                                          (let ((body (fast-io:finish-output-buffer body-buffer)))
-                                                                                            (funcall body-cb body body-finished-p)
-                                                                                            (setf body-buffer nil)))))))))
+                                          (setf (request-body-callback-setcb request)
+						(lambda (body-cb)
+                                                  (when body-buffer
+                                                    (let ((body (fast-io:finish-output-buffer body-buffer)))
+                                                      (funcall body-cb body body-finished-p)
+                                                      (setf body-buffer nil)))))))))
                                 (progn
-                                  (vom:warn "(route) Missing route: ~a ~s" (request-method request) route-path)
+                                  (vom:warn "(route) Missing route: ~a ~s"
+					    (request-method request)
+					    route-path)
                                   (funcall 'main-event-handler (make-instance 'route-not-found
                                                                               :resource route-path
-                                                                              :socket sock) sock)
+                                                                              :socket sock)
+					   sock)
                                   (return-from skip-route)))))
                      ;; load our route, but if we encounter a use-next-route condition,
                      ;; add the route to the exclude list and load the next route with
@@ -137,16 +143,21 @@
                                     (lambda (e)
                                       (declare (ignore e))
                                       (vom:debug1 "(route) Next route")
-                                      (push route route-exclude)
-                                      (setf route (find-route (fast-http:http-method http)
-                                                              route-path
-                                                              :exclude route-exclude))
+                                      (push route
+					    route-exclude)
+                                      (setf route
+					    (find-route (fast-http:http-method http)
+                                                        route-path
+                                                        :exclude route-exclude))
                                       (return-from next))))
                                ;; run our route and break the loop if successful
                                (progn
                                  (run-route route)
                                  (return-from run-route))))))))
-                   (do-run-hooks (sock) (run-hooks :post-route request response) nil))))
+                   (do-run-hooks (sock) (run-hooks :post-route
+						   request
+						   response)
+		     nil))))
              (header-callback (headers)
                "Called when our HTTP parser graciously passes us a block of
                 parsed headers. Allows us to find which route we're going to
@@ -163,16 +174,23 @@
                               response
                               method
                               resource
-                              (if host (concatenate 'string "(" host ")") ""))
-                   (setf route-path path)
+                              (if host
+				  (concatenate 'string "(" host ")")
+				  ""))
+                   (setf route-path
+			 path)
                    ;; save the parsed uri for plugins/later code
                    (setf (request-uri request) parsed-uri
                          (request-headers request) headers)
-                   (do-run-hooks (sock) (run-hooks :parsed-headers request)
+                   (do-run-hooks (sock) (run-hooks :parsed-headers
+						   request)
                      ;; set up some tracking/state values now that we have headers
                      ;; ALSO, check for _method var when routing.
-                     (let* ((method (get-overridden-method request method))
-                            (found-route (find-route method path :host host)))
+                     (let* ((method (get-overridden-method request
+							   method))
+                            (found-route (find-route method
+						     path
+						     :host host)))
                        (setf route found-route
                              (request-method request) method
                              (request-resource request) resource)
