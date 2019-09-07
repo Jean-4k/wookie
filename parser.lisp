@@ -49,8 +49,11 @@
          (route nil)  ; holds the current route, filled in below once we get headers
          (route-dispatched nil)
          (error-occurred-p nil)
-         (request (make-instance 'request :socket sock :http http))
-         (response (make-instance 'response :request request))
+         (request (make-instance 'request
+				 :socket sock
+				 :http http))
+         (response (make-instance 'response
+				  :request request))
          (request-body-buffer nil)
          (body-buffer (fast-io:make-output-buffer))
          (body-finished-p nil))
@@ -65,8 +68,11 @@
                ;; dispatch the current route, but only if we haven't already done so
                (when route-dispatched
                  (return-from dispatch-route))
-               (setf route-dispatched t)
-               (do-run-hooks (sock) (run-hooks :pre-route request response)
+               (setf route-dispatched
+		     t)
+               (do-run-hooks (sock) (run-hooks :pre-route
+					       request
+					       response)
                  (block skip-route
                    (flet ((run-route (route)
                             (if route
