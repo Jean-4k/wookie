@@ -139,25 +139,29 @@
 
 
 
-(defun route-equal (route method resource-str)
-  "Test the property values of :method and :resource-str in a route
-   plist for equality against a supplied method and resource-str."
+(defun route-equal (route method resource-str vhost)
+  "Test the property values of :method and :resource-str and :vhost in
+   a route plist for equality against a supplied method and
+   resource-str and vhost."
   (and (method-equal (getf route :method) method)
-       (string= (getf route :resource-str) resource-str)))
+       (string= (getf route :resource-str) resource-str)
+       (string= (getf route :vhost) vhost)))
 
 
 
 (defun upsert-route (new-route)
-  "Add a new route to the table. If a route already exists with the same method
-   and resource string, it is replaced with the new one in the same position the
-   old route existed in (as to preserve routing order)."
+  "Add a new route to the table. If a route already exists with the
+   same method and resource string and vhost, it is replaced with the
+   new one in the same position the old route existed in (as to
+   preserve routing order)."
   (let ((route-found nil)
         (resource-str (getf new-route :resource-str) )
-        (method (getf new-route :method)))
+        (method (getf new-route :method))
+	(vhost (getf new-route :vhost)))
     (unless (zerop (length (wookie-state-routes *state*)))
       (loop for i from 0
             for route across (wookie-state-routes *state*) do
-        (when (route-equal route method resource-str)
+        (when (route-equal route method resource-str vhost)
           (setf (aref (wookie-state-routes *state*) i) new-route
                 route-found t)
           (return))))
