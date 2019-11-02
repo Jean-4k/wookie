@@ -156,7 +156,7 @@
              (next ()
                (let ((n (read-sequence buffer fstream)))
                  (if (zerop n)
-                     (finish)
+		     (finish)
                      (progn
                        (write-sequence buffer stream :start 0 :end n)
                        (as:delay #'next))))))

@@ -164,7 +164,8 @@
               (request-method req) (get-log-uri (request-uri req))
               status (length body)))
   ;; make sure we haven't already responded to this request
-  (when (response-finished-p response)
+  (when (and (response-finished-p response)
+	     (not (eq (response-finished-p response) :headers-sent)))
     (error (make-instance 'response-already-sent :response response)))
 
   (let* ((request (response-request response))
@@ -197,12 +198,13 @@
           (set-header headers :content-length (length body-enc)))
         ;; make writing a single HTTP line a bit less painful
         (flet ((write-http-line (format-str &rest format-args)
-                 (as:write-socket-data
-                   socket
-                   (apply #'format
-                          (append (list nil
-                                        (concatenate 'string format-str "~c~c"))
-                                  (append format-args (list #\return #\newline)))))))
+		 (unless (eq (response-finished-p response) :headers-sent)
+                   (as:write-socket-data
+                    socket
+                    (apply #'format
+                           (append (list nil
+                                         (concatenate 'string format-str "~c~c"))
+                                   (append format-args (list #\return #\newline))))))))
           ;; write the status line
           (write-http-line "HTTP/1.1 ~a ~a" status status-text)
           (setf headers (add-default-headers headers))
@@ -216,8 +218,10 @@
                              (write-http-line "~a: ~a" header-name value)))))
           ;; finalize headers (closing \r\n)
           (write-http-line "")
+	  
           ;; send body if specified
-          (when body
+          (when (and body
+		     (not (eq (response-finished-p response) :headers-sent)))
             (as:write-socket-data socket body-enc)))
 
         ;; auto-select the best close method, but only if close wasn't specified
