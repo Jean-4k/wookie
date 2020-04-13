@@ -177,6 +177,7 @@
 				 :socket sock
 				 :http http))
 	 (response (make-instance 'response
+				  :headers (make-hash-table :test #'equal)
 				  :request request)))
     (make-instance 'wookie-parser
 		   :request request
