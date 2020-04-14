@@ -276,6 +276,95 @@
 
 
 
+(defun store-body-in-request (chunk start end parser)
+  (when (request-store-body (request parser))
+    (unless (request-body-buffer parser)
+      (setf (request-body-buffer parser)
+	    (fast-io:make-output-buffer)))
+    (if (< (+ (fast-io:buffer-position (request-body-buffer parser))
+	      (- (or end (length chunk))
+		 (or start 0)))
+	   *max-body-size*)
+	(progn
+	  (fast-io:fast-write-sequence chunk
+				       (request-body-buffer parser)
+				       (or start 0)
+				       end)
+	  t)
+	(progn
+	  (send-response (response parser)
+			 :status 413
+			 :body "request body too large")
+	  (setf (error-occurred-p parser) t)
+	  nil))))
+
+
+
+;; we have a body chunking callback and the body has
+;; been buffering. append the latest chunk to the
+;; buffer and send the entire buffer into the body cb.
+;; then, nil the buffer so we know we don't have to do
+;; body buffering anymore
+(defun body-chunking-callback-and-body-has-been-buffering (chunk start end parser)
+  (fast-io:fast-write-sequence chunk
+			       (body-buffer parser)
+			       start
+			       end)
+  (funcall request-body-cb
+	   (fast-io:finish-output-buffer (body-buffer parser))
+	   (body-finished-p parser))
+  (setf (body-buffer parser) nil))
+
+
+
+;; we have a chunking callback set up by the route, no
+;; need to do anything fancy. just send the chunk in.
+(defun body-chunking-callback-set-by-route (chunk start end parser)
+  (funcall request-body-cb
+	   chunk
+	   (body-finished-p parser)
+	   :start start
+	   :end end))
+
+
+;; we're allowing chunking through this route, we're
+;; allowing body buffering through this route, and the
+;; chunking callback hasn't been set up yet (possible
+;; if the client starts streaming the body before our
+;; :pre-route hook(s) finish their futures). create a
+;; body buffer if we don't have one and start saving
+;; our chunks to it (until our route has a chance to
+;; set up the chunking cb).
+(defun body-chunking-callback-not-set (chunk start end parser)
+  (fast-io:fast-write-sequence chunk
+			       (body-buffer parser)
+			       start
+			       end))
+
+
+
+(defun forward-chunk-to-callback-provided-in-chunk-enabled-router (chunk start end parser sock route)
+  (do-run-hooks (sock) (run-hooks :body-chunk
+				  (request parser)
+				  chunk
+				  start
+				  end
+				  (body-finished-p parser))
+    (let ((request-body-cb (request-body-callback (request parser))))
+      (cond ((and request-body-cb
+		  (body-buffer parser))
+	     (body-chunking-callback-and-body-has-been-buffering chunk
+								 start
+								 end
+								 parser))
+	    (request-body-cb
+	     (body-chunking-callback-set-by-route chunk start end parser))
+	    ((and (getf route :allow-chunking)
+		  (getf route :buffer-body))
+	     (body-chunking-callback-not-set chunk start end parser))))))
+
+
+
 (defmethod body-callback ((parser wookie-parser)
 			  sock)
   "Called (sometimes multiple times per request) when the HTTP
@@ -289,73 +378,11 @@
 	    (when (error-occurred-p parser)
 	      (return-from body-callback-closure))
 	    ;; store the body in the request
-	    (when (request-store-body (request parser))
-	      (unless (request-body-buffer parser)
-		(setf (request-body-buffer parser)
-		      (fast-io:make-output-buffer)))
-	      (if (< (+ (fast-io:buffer-position (request-body-buffer parser))
-			(- (or end (length chunk))
-			   (or start 0)))
-		     *max-body-size*)
-		  (fast-io:fast-write-sequence chunk
-					       (request-body-buffer parser)
-					       (or start 0)
-					       end)
-		  (progn
-		    (send-response (response parser)
-				   :status 413
-				   :body "request body too large")
-		    (setf (error-occurred-p parser) t)
-		    (return-from body-callback-closure))))
+	    (unless (store-body-in-request chunk start end parser)
+	      (return-from body-callback-closure))
 	    ;; forward the chunk to the callback provided in the chunk-enabled
 	    ;; router
-	    (do-run-hooks (sock) (run-hooks :body-chunk
-					    (request parser)
-					    chunk
-					    start
-					    end
-					    (body-finished-p parser))
-	      (let ((request-body-cb (request-body-callback
-				      (request parser))))
-		(cond ((and request-body-cb
-			    (body-buffer parser))
-		       ;; we have a body chunking callback and the body has
-		       ;; been buffering. append the latest chunk to the
-		       ;; buffer and send the entire buffer into the body cb.
-		       ;; then, nil the buffer so we know we don't have to do
-		       ;; body buffering anymore
-		       (fast-io:fast-write-sequence chunk
-						    (body-buffer parser)
-						    start
-						    end)
-		       (describe request-body-cb)
-		       (funcall request-body-cb
-				(fast-io:finish-output-buffer
-				 (body-buffer parser))
-				(body-finished-p parser))
-		       (setf (body-buffer parser) nil))
-		      (request-body-cb
-		       ;; we have a chunking callback set up by the route, no
-		       ;; need to do anything fancy. just send the chunk in.
-		       (funcall request-body-cb
-				chunk
-				(body-finished-p parser)
-				:start start
-				:end end))
-		      ((and (getf route :allow-chunking)
-			    (getf route :buffer-body))
-		       ;; we're allowing chunking through this route, we're
-		       ;; allowing body buffering through this route, and the
-		       ;; chunking callback hasn't been set up yet (possible
-		       ;; if the client starts streaming the body before our
-		       ;; :pre-route hook(s) finish their futures). create a
-		       ;; body buffer if we don't have one and start saving
-		       ;; our chunks to it (until our route has a chance to
-		       ;; set up the chunking cb).
-		       (fast-io:fast-write-sequence chunk
-						    (body-buffer parser)
-						    start
-						    end)))))))))
+	    (forward-chunk-to-callback-provided-in-chunk-enabled-router chunk start end parser sock route)))))
 
 
 
@@ -431,7 +458,6 @@
    http-parse parser which decide amongst themselves, during different points in
    the parsing, when to dispatch to the found router, when to send chunked
    content to the route, etc."
-  (vom:debug1 "(connect) ~a" sock)
   ;; TODO pass client address info into :connect hook
   (do-run-hooks (sock) (run-hooks :connect sock)
     (setup-parser sock)))
@@ -442,7 +468,6 @@
   "A simple read-cb handler that passes data to the HTTP parser attached to the
    socket the data is coming in on. The parser runs all necessary callbacks
    directly, so this function just blindly feeds the data in."
-  (vom:debug1 "(read) ~a: ~a bytes" sock (length data))
   ;; grab the parser stored in the socket and pipe the data into it
   (let ((parser (getf (as:socket-data sock) :parser)))
     (handler-bind

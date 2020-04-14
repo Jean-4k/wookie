@@ -27,7 +27,16 @@
 			 (setf field-headers (hash-table-to-plist field-headers))
 			 (setf field-meta (hash-table-to-plist field-meta))
 			 (setf body-bytes
-			       (flexi-streams::vector-stream-vector body-bytes))
+			       (flexi-streams::vector-stream-vector
+				(if (sb-sys:fd-stream-p body-bytes)
+				    (let* ((length (file-length body-bytes))
+					   (buffer (make-array length
+								  :element-type '(unsigned-byte 8)
+								  :adjustable t
+								  :fill-pointer length)))
+				      (read-sequence buffer body-bytes)
+				      (make-instance 'flexi-streams::vector-stream :vector buffer))
+				    body-bytes)))
                          (flet ((save-form-data ()
                                   ;; append the data into our tmp field-buffer storage
                                   (cl-async-util:write-to-buffer body-bytes
